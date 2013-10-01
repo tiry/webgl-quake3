@@ -1,6 +1,14 @@
+*.class
+
+# Package Files #
+*.jar
+*.ear
+
+nuxeo-automation-jsshell-quake-plugin/target/*
+
 .DS_Store
-demo_baseq3/textures/*
-demo_baseq3/models/*
-demo_baseq3/scripts/*
-demo_baseq3/maps/*
-demo_baseq3/music/*
+nuxeo-automation-jsshell-quake-plugin/src/main/resources/web/nuxeo.war/webgl-quake3/demo_baseq3/textures/*
+nuxeo-automation-jsshell-quake-plugin/src/main/resources/web/nuxeo.war/webgl-quake3/demo_baseq3/models/*
+nuxeo-automation-jsshell-quake-plugin/src/main/resources/web/nuxeo.war/webgl-quake3/demo_baseq3/scripts/*
+nuxeo-automation-jsshell-quake-plugin/src/main/resources/web/nuxeo.war/webgl-quake3/demo_baseq3/maps/*
+nuxeo-automation-jsshell-quake-plugin/src/main/resources/web/nuxeo.war/webgl-quake3/demo_baseq3/music/*

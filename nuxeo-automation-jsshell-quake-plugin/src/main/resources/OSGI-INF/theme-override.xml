@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<component name="org.nuxeo.theme.automation.html.quake.override">
+
+  <require>org.nuxeo.theme.html</require>
+  <require>org.nuxeo.theme.nuxeo.default</require>
+  <require>org.nuxeo.theme.automation.html.override</require>
+
+  <extension target="org.nuxeo.theme.services.ThemeService" point="views">
+    <view name="nuxeo5 includes" template-engine="jsf-facelets" merge="true">
+      <format-type>widget</format-type>
+      <resource>quake-shell.js</resource>
+    </view>
+  </extension>
+
+  <extension target="org.nuxeo.theme.services.ThemeService"
+    point="resources">
+    <resource name="quake-shell.js">
+      <path>scripts/shell/quake-shell.js</path>
+      <require>nxshell-builtins.js</require>
+    </resource>
+  </extension>
+
+</component>
