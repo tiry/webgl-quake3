@@ -73,22 +73,20 @@ function getQueryVariable(variable) {
 function initGL(gl, canvas) {
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
     gl.clearDepth(1.0);
-    
+
     gl.enable(gl.DEPTH_TEST);
     gl.enable(gl.BLEND);
     gl.enable(gl.CULL_FACE);
-    
+
     projectionMat = mat4.create();
     modelViewMat = mat4.create();
-    
+
     initMap(gl);
 }
 
 // Load the map
 function initMap(gl) {
-    var titleEl = document.getElementById("mapTitle");
-    titleEl.innerHtml = mapName.toUpperCase();
-    
+
     var tesselation = getQueryVariable("tesselate");
     if(tesselation) {
         tesselation = parseInt(tesselation, 10);
@@ -122,16 +120,16 @@ function respawnPlayer(index) {
             index = (lastIndex+1)% map.entities.info_player_deathmatch.length;
         }
         lastIndex = index;
-    
+
         var spawnPoint = map.entities.info_player_deathmatch[index];
         playerMover.position = [
             spawnPoint.origin[0],
             spawnPoint.origin[1],
             spawnPoint.origin[2]+30 // Start a little ways above the floor
         ];
-        
+
         playerMover.velocity = [0,0,0];
-        
+
         zAngle = -spawnPoint.angle * (3.1415/180) + (3.1415*0.5); // Negative angle in radians + 90 degrees
         xAngle = 0;
     }
@@ -141,14 +139,14 @@ var lastMove = 0;
 
 function onFrame(gl, event) {
     if(!map || !playerMover) { return; }
-    
+
     // Update player movement @ 60hz
     // The while ensures that we update at a fixed rate even if the rendering bogs down
     while(event.elapsed - lastMove >= 16) {
         updateInput(16);
         lastMove += 16;
     }
-    
+
     drawFrame(gl);
 }
 
@@ -157,15 +155,15 @@ function drawFrame(gl) {
     // Clear back buffer but not color buffer (we expect the entire scene to be overwritten)
     gl.depthMask(true);
     gl.clear(gl.DEPTH_BUFFER_BIT);
-    
+
     if(!map || !playerMover) { return; }
-    
+
     // Matrix setup
     mat4.identity(modelViewMat);
     mat4.rotateX(modelViewMat, xAngle-Math.PI/2);
     mat4.rotateZ(modelViewMat, zAngle);
     mat4.translate(modelViewMat, [-playerMover.position[0], -playerMover.position[1], -playerMover.position[2]-30]);
-    
+
     // Here's where all the magic happens...
     map.draw(cameraPosition, modelViewMat, projectionMat);
 }
@@ -179,7 +177,7 @@ function moveLookLocked(xDelta, yDelta) {
         zAngle += Math.PI*2;
     while (zAngle >= Math.PI*2)
         zAngle -= Math.PI*2;
-            
+
     xAngle += yDelta*0.0025;
     while (xAngle < -Math.PI*0.5)
         xAngle = -Math.PI*0.5;
@@ -193,9 +191,9 @@ function filterDeadzone(value) {
 
 function updateInput(frameTime) {
     if(!playerMover) { return; }
-        
+
     var dir = [0, 0, 0];
-    
+
     // This is our first person movement code. It's not really pretty, but it works
     if(pressed['W'.charCodeAt(0)]) {
         dir[1] += 1;
@@ -209,32 +207,32 @@ function updateInput(frameTime) {
     if(pressed['D'.charCodeAt(0)]) {
         dir[0] += 1;
     }
-    
+
     for (var i = 0; i < navigator.gamepads.length; ++i) {
         var pad = navigator.gamepads[i];
         if(pad) {
             dir[0] += filterDeadzone(pad.axes[0]);
             dir[1] -= filterDeadzone(pad.axes[1]);
-        
+
             moveLookLocked(
                 filterDeadzone(pad.axes[2]) * 25.0,
                 filterDeadzone(pad.axes[3]) * 25.0
             );
-            
+
             for(var j = 0; j < pad.buttons.length; ++j) {
                 if(pad.buttons[j]) { playerMover.jump(); }
             }
         }
     }
-    
+
     if(dir[0] !== 0 || dir[1] !== 0 || dir[2] !== 0) {
         mat4.identity(cameraMat);
         mat4.rotateZ(cameraMat, zAngle);
         mat4.inverse(cameraMat);
-        
+
         mat4.multiplyVec3(cameraMat, dir);
     }
-    
+
     // Send desired movement direction to the player mover for collision detection against the map
     playerMover.move(dir, frameTime);
 }
@@ -248,51 +246,51 @@ function initEvents() {
     var lastMoveY = 0;
     var viewport = document.getElementById("viewport");
     var viewportFrame = document.getElementById("viewport-frame");
-    
+
     document.addEventListener("keydown", function(event) {
         if(event.keyCode == 32 && !pressed[32]) {
             playerMover.jump();
         }
         pressed[event.keyCode] = true;
     }, false);
-    
+
     document.addEventListener("keypress", function(event) {
         if(event.charCode == 'R'.charCodeAt(0) || event.charCode == 'r'.charCodeAt(0)) {
             respawnPlayer(-1);
         }
     }, false);
-    
+
     document.addEventListener("keyup", function(event) {
         pressed[event.keyCode] = false;
     }, false);
-    
+
     function startLook(x, y) {
         movingModel = true;
-        
+
         lastX = x;
         lastY = y;
     }
-    
+
     function endLook() {
         movingModel = false;
     }
-    
+
     function moveLook(x, y) {
         var xDelta = x - lastX;
         var yDelta = y - lastY;
         lastX = x;
         lastY = y;
-        
+
         if (movingModel) {
             moveLookLocked(xDelta, yDelta);
         }
     }
-    
+
     function startMove(x, y) {
         lastMoveX = x;
         lastMoveY = y;
     }
-    
+
     function moveUpdate(x, y, frameTime) {
         var xDelta = x - lastMoveX;
         var yDelta = y - lastMoveY;
@@ -310,11 +308,11 @@ function initEvents() {
         // Send desired movement direction to the player mover for collision detection against the map
         playerMover.move(dir, frameTime*2);
     }
-    
+
     viewport.addEventListener("click", function(event) {
         viewport.requestPointerLock();
     }, false);
-    
+
     // Mouse handling code
     // When the mouse is pressed it rotates the players view
     viewport.addEventListener("mousedown", function(event) {
@@ -332,7 +330,7 @@ function initEvents() {
             moveLook(event.pageX, event.pageY);
         }
     }, false);
-    
+
     // Touch handling code
     viewport.addEventListener('touchstart', function(event) {
         var touches = event.touches;
@@ -392,15 +390,15 @@ function renderLoop(gl, element, stats) {
     var startTime = new Date().getTime();
     var lastTimestamp = startTime;
     var lastFps = startTime;
-            
+
     function onRequestedFrame(){
         timestamp = new Date().getTime();
-        
+
         window.requestAnimationFrame(onRequestedFrame, element);
 
 
         stats.begin();
-        
+
         onFrame(gl, {
             timestamp: timestamp,
             elapsed: timestamp - startTime,
@@ -414,7 +412,7 @@ function renderLoop(gl, element, stats) {
 
 function main() {
     var stats = new Stats();
-    document.getElementById("viewport-frame").appendChild( stats.domElement );
+    //document.getElementById("viewport-frame").appendChild( stats.domElement );
 
     var canvas = document.getElementById("viewport");
 
@@ -435,7 +433,7 @@ function main() {
         gl.viewport(0, 0, canvas.width, canvas.height);
         mat4.perspective(45.0, canvas.width/canvas.height, 1.0, 4096.0, projectionMat);
     }
-    
+
     if(!gl) {
         document.getElementById('viewport-frame').style.display = 'none';
     } else {
@@ -445,8 +443,8 @@ function main() {
     }
 
     onResize();
-    window.addEventListener("resize", onResize, false);   
-    
+    window.addEventListener("resize", onResize, false);
+
     // Handle fullscreen transition
     var viewportFrame = document.getElementById("viewport-frame");
     document.addEventListener("fullscreenchange", function() {
@@ -455,21 +453,24 @@ function main() {
         }
         onResize();
     }, false);
-    
+
     var button = document.getElementById('fullscreenBtn');
     button.addEventListener('click', function() {
         viewportFrame.requestFullScreen();
     }, false);
 }
 
-var vp = jQuery('<div id="viewport-frame"><canvas id="viewport"></canvas></div>');
+var vp = jQuery('<div id="viewport-frame"><canvas id="viewport"></canvas><div id="loading">Loading...</div><divid="fullscreenBtn">full screen</div></div>');
 
 if (!container) {
  container = "body";
 }
 
 jQuery(container).append(vp);
-jQuery(container).append(jQuery('<img src="images/fullscreen.png" id="fullscreenBtn"/>'));
+jQuery("#viewport-frame").css("text-align","center").css("width","854px").css("height","480px");
+jQuery("#viewport").css("width","854px").css("height","480px").css("background-color", "black");
+
+//jQuery(container).append(jQuery('<img src="images/fullscreen.png" id="fullscreenBtn"/>'));
 
 main();
 }
