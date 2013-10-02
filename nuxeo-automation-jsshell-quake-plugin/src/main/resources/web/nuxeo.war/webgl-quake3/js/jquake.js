@@ -466,11 +466,9 @@ if (!container) {
  container = "body";
 }
 
-jQuery(container).append(vp);
+jQuery(container).prepend(vp);
 jQuery("#viewport-frame").css("text-align","center").css("width","854px").css("height","480px");
 jQuery("#viewport").css("width","854px").css("height","480px").css("background-color", "black");
-
-//jQuery(container).append(jQuery('<img src="images/fullscreen.png" id="fullscreenBtn"/>'));
 
 main();
 }

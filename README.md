@@ -1,13 +1,9 @@
-WebGL Quake 3 Renderer
-=======================
 
-WebGL app that renders levels from Quake 3. Quake 3 and anything related to it 
-is the property of id Software, who does not authorize or endorse this project 
-in any way.
+# Quake3 command for Nuxeo Quake like shell
 
+This is a nuxeo plugin that contribute to the Javascript Shell a new `quake` command that allows to start a Quake model webgl renderer inside the page.
 
-Related Links
--------------
+All the heavy lifting is done using the **WebGL Quake 3 Renderer** 
 
 * [Live Demo](http://media.tojicode.com/q3bsp)
 * [Technical Overview](http://blog.tojicode.com/2010/08/rendering-quake-3-maps-with-webgl-tech.html)
